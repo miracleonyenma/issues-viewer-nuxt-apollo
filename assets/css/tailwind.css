@@ -21,7 +21,7 @@ body {
 }
 
 .form-control {
-  @apply flex flex-col gap-1 w-fit;
+  @apply flex flex-col gap-1;
 }
 
 .form-control input, .form-control textarea {

@@ -84,7 +84,7 @@ useHead({
     <header class="issues-header site-section">
       <div class="wrapper">
         <h1 class="font-semibold text-2xl">Issues viewer</h1>
-        <div class="settings-container grid grid-cols-2">
+        <div class="settings-container grid md:grid-cols-2 gap-4">
           <div class="wrapper">
             <form class="my-2">
               <div class="wrapper">
