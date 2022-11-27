@@ -14,7 +14,7 @@ export default defineNuxtConfig({
     tokenStorage: "cookie",
     clients: {
       default: {
-        tokenName: "apollo-token",
+        tokenName: "github_token",
         httpEndpoint: "https://api.github.com/graphql",
       },
     },

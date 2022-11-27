@@ -1,6 +1,8 @@
 <!-- ./app.vue -->
 
 <script setup>
+const github_token = useCookie("github_token");
+
 // define query
 const query = gql`
   query ($name: String!, $owner: String!, $limit: Int) {
@@ -50,6 +52,8 @@ const variables = ref({
   limit: 10,
 });
 
+const token = ref(github_token.value);
+
 const { data, error, refresh } = useAsyncQuery(query, variables.value);
 
 const loadMore = () => {
@@ -59,42 +63,81 @@ const loadMore = () => {
   }
 };
 
+const saveToken = () => {
+  github_token.value = token.value;
+};
+
 console.log({ data, error });
+
+useHead({
+  title: "Issues viewer",
+  meta: [
+    {
+      name: "description",
+      content: "Issues viewer",
+    },
+  ],
+});
 </script>
 <template>
   <main>
     <header class="issues-header site-section">
       <div class="wrapper">
         <h1 class="font-semibold text-2xl">Issues viewer</h1>
-        <form class="my-2">
+        <div class="settings-container grid grid-cols-2">
           <div class="wrapper">
-            <div class="form-group">
-              <div class="form-control">
-                <label for="repository-name"> Repository name </label>
-                <input
-                  type="text"
-                  id="repository-name"
-                  v-model="variables.name"
-                  placeholder="Repository name"
-                />
+            <form class="my-2">
+              <div class="wrapper">
+                <div class="form-group">
+                  <div class="form-control">
+                    <label for="repository-name"> Repository name </label>
+                    <input
+                      type="text"
+                      id="repository-name"
+                      v-model="variables.name"
+                      placeholder="Repository name"
+                    />
+                  </div>
+                  <div class="form-control">
+                    <label for="repository-owner"> Repository owner </label>
+                    <input
+                      type="text"
+                      id="repository-owner"
+                      v-model="variables.owner"
+                      placeholder="Repository owner"
+                    />
+                  </div>
+                </div>
               </div>
-              <div class="form-control">
-                <label for="repository-owner"> Repository owner </label>
-                <input
-                  type="text"
-                  id="repository-owner"
-                  v-model="variables.owner"
-                  placeholder="Repository owner"
-                />
-              </div>
+            </form>
+            <button @click="refresh" class="cta">Refresh</button>
+          </div>
+          <div class="wrapper">
+            <div class="form-cont">
+              <form class="my-2 ml-auto">
+                <div class="form-control">
+                  <label for="token">Your GitHub Token</label>
+                  <input v-model="token" type="text" name="token" id="token" />
+                  <span class="text-xs">
+                    Find out how to get a
+                    <a
+                      class="underline text-blue-600"
+                      href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >personal access token</a
+                    >
+                  </span>
+                </div>
+              </form>
+              <button @click="saveToken" type="button" class="cta">Save</button>
             </div>
           </div>
-        </form>
-        <button @click="refresh" class="cta">Refresh</button>
+        </div>
       </div>
     </header>
     <section class="site-section issues-section">
-      <div class="wrapper">
+      <div v-if="data?.repository" class="wrapper">
         <ul class="issues">
           <li v-for="issue in data.repository.issues.nodes" :key="issue.id">
             <IssueCard :issue="issue" />
@@ -109,6 +152,9 @@ console.log({ data, error });
             Load more
           </button>
         </div>
+      </div>
+      <div v-else>
+        <p class="text-center">No issues found or something's not right 🥲</p>
       </div>
     </section>
   </main>
